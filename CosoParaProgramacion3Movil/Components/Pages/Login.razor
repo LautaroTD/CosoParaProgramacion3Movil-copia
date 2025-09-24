@@ -1,0 +1,61 @@
+﻿@page "/login"
+@using CosoParaProgramacion3Movil.Models
+@using CosoParaProgramacion3Movil.Services
+
+@inject UsuarioService usuarioService
+@inject SesionService sesionService
+
+
+<h3>Iniciar sesión</h3>
+
+<div class="form-group">
+    <label>Nombre de Usuario</label>
+    <input @bind="nombre" class="form-control" />
+</div>
+
+<div class="form-group">
+    <label>Contraseña</label>
+    <input @bind="contrasena" type="password" class="form-control" />
+</div>
+
+<button class="btn btn-primary" @onclick="Volver">Volver al Menu</button>
+<button class="btn btn-primary" @onclick="LoginUser">Ingresar</button>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <p style="color:red">@mensaje</p>
+}
+
+@code {
+    private string nombre;
+    private string contrasena;
+    private string mensaje;
+
+    List<Usuario> listaUsuarios = new List<Usuario>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaUsuarios = usuarioService.GetUsuarios();
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void LoginUser()
+    {
+        if (sesionService.Login(nombre, contrasena))
+        {
+
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            mensaje = "Usuario o contraseña incorrectos";
+        }
+    }
+
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+}

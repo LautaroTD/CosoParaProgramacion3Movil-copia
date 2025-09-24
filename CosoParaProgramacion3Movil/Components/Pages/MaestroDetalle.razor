@@ -1,0 +1,101 @@
+﻿@page "/maestro/{id}"
+@using CosoParaProgramacion3Movil.Models
+@using CosoParaProgramacion3Movil.Services
+
+@inject NavigationManager navigationManager
+@inject UsuarioService usuarioService
+<h3>
+    @if (id == "0")
+    {
+        <span>Crear Usuario</span>
+    }
+    else
+    {
+        <span>Editar Usuario</span>
+    }
+</h3>
+
+
+
+<EditForm OnValidSubmit="@Grabar" Model="@usuario">
+    <div class="mt-3">
+        <label>Nombre</label>
+        <InputText @bind-Value="@nombreNuevo" placeholder="@usuario.Nombre" />
+    </div>
+    <div class="mt-3">
+        <label>Contraseña</label>
+        <InputText @bind-Value="@contrasenaNuevo" placeholder="@usuario.Contrasena" />
+    </div>
+    <div class="mt-3">
+        <label>Rol</label>
+        <InputText @bind-Value="@rolNuevo" placeholder="@usuario.Rol" />
+    </div>
+    <div class="mt-3">
+        <label>Imagen</label>
+        <InputText @bind-Value="@imagenNuevo" placeholder="@usuario.Imagen" />
+    </div>
+</EditForm>
+
+
+<div class="text-center mt-3">
+    <button class="btn btn-primary" @onclick="Volver">Cancelar</button>
+    <button class="btn btn-success" @onclick="Grabar">Grabar</button>
+</div>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public Usuario usuario;
+
+    string nombreNuevo;
+    string contrasenaNuevo;
+    string rolNuevo;
+    string imagenNuevo;
+
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            if (int.Parse(id) == 0)
+            {
+                usuario = new Usuario();
+            }
+            else
+            {
+                usuario = usuarioService.GetUsuarios(int.Parse(id));
+            }
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public void Volver()
+    {
+        // Navegar a la página de edición del producto
+        navigationManager.NavigateTo($"/maestro");
+    }
+
+    public async Task Grabar()
+    {
+        if (nombreNuevo is not null) { usuario.Nombre = nombreNuevo; } else { usuario.Nombre = ""; }
+        if (contrasenaNuevo is not null) { usuario.Contrasena = contrasenaNuevo; } else { usuario.Contrasena = ""; }
+        if (rolNuevo is not null) { usuario.Rol = rolNuevo; } else { usuario.Rol = ""; }
+        if (imagenNuevo is not null) { usuario.Imagen = imagenNuevo; } else { usuario.Imagen = "img/generico.jpg"; }
+
+        if (int.Parse(id) == 0)
+        {
+            usuarioService.AddUsuario(usuario);
+        }
+        else
+        {
+            usuarioService.UpdateUsuario(usuario);
+        }
+
+        navigationManager.NavigateTo("/maestro");
+    }
+}
