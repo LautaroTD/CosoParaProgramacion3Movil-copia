@@ -3,7 +3,7 @@
 @using CosoParaProgramacion3Movil.Services
 
 @inject NavigationManager navigationService
-@inject SesionService sesionService
+@inject AuthService sesionService
 
 <header>
 <h1>Enciclopedia de Plantas</h1>
@@ -74,11 +74,11 @@
         navigationService.NavigateTo("/login");
     }
 
-    private void CerrarSesion()
+    private async Task CerrarSesion()
     {
-        @if (sesionService.EstaAutenticado)
+        if (await sesionService.EstaAutenticadoAsync() == true)
         {
-            sesionService.Logout();
+            await sesionService.LogoutAsync();
             navigationService.NavigateTo("/login");
         } else
         {

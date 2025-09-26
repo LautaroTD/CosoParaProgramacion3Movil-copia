@@ -4,6 +4,9 @@
 
 @inject NavigationManager navigationManager
 @inject UsuarioService usuarioService
+@*
+
+
 <h3>
     @if (id == "0")
     {
@@ -14,8 +17,6 @@
         <span>Editar Usuario</span>
     }
 </h3>
-
-
 
 <EditForm OnValidSubmit="@Grabar" Model="@usuario">
     <div class="mt-3">
@@ -99,3 +100,6 @@
         navigationManager.NavigateTo("/maestro");
     }
 }
+
+
+*@

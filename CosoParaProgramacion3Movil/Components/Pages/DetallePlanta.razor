@@ -5,7 +5,7 @@
 
 @inject PlantaService plantaService
 @inject NavigationManager navigationManager
-@inject SesionService sesionService
+@inject AuthService sesionService
 
 <h3>
     @if (id == "0")
@@ -53,7 +53,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!sesionService.EstaAutenticado)
+        if (await sesionService.EstaAutenticadoAsync() == false)
         {
             navigationManager.NavigateTo("/login");
             return;
