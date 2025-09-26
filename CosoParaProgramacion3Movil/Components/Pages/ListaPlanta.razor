@@ -1,67 +1,84 @@
 ﻿@page "/planta"
-@using CosoParaProgramacion3Movil.Models
-@using CosoParaProgramacion3Movil.Services
+@using CosoParaProgramacion3Movil.Models;
+@using System.Collections.Generic;
+@using System.Linq;
+@using System.Threading.Tasks;
+@using CosoParaProgramacion3Movil.Services;
 
-@inject PlantaService plantaService //Si te dice algo como 'Cannot provide a value for property 'plantaService' on type 'ListaPlanta'.There is no registered service of type 'CosoParaProgramacion3Movil.Services.PlantaService'.' Significa que tenes que agregar OTRO servicio en el MauiProgram.cs. Agregaste esto "builder.Services.AddSingleton<Services.PlantaService>();" para solucionarlo, y para Usuario tambien.
-@inject SesionService sesionService
 @inject NavigationManager navigationManager
 
+<!-- si esta pagina no carga, puede ser porque el url esta mal porque te olvidaste el prefijo PELOTUDO JJAJAJAJAAJAA QUE MOGOBLICO-->
 
-<h3>Lista de Plantas</h3>
-<div class="text-center">
-    <button class="btn btn-secondary" @onclick="Volver">Volver al Menu</button>
-    <button class="btn btn-primary" @onclick="CrearPlanta">Agregar Planta</button>
-</div>
+<h3>Plantas</h3>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Imagen</th>
-            <th>Nombre Cientifico</th>
-            <th>Nombre Vulgar</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (listaPlanta != null && listaPlanta.Count > 0)
+<button class="btn btn-primary" @onclick="Volver">Volver</button>
+
+<button class="btn btn-primary" @onclick="CargarPlantas">Cargar Plantas</button>
+
+<button class="btn btn-primary" @onclick="CrearPlanta">Crear Plantas</button>
+
+@if (baseDePlantas != null)
+{   
+@if (!baseDePlantas.Any())
+{
+    <p><em>No hay productos disponibles.</em></p>
+}
+else
+{
+    <table width="100%">
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre Cientifico</th>
+                <th>Nombre Vulgar</th>
+            </tr>
+        </thead>
+        @foreach (var planta in baseDePlantas)
         {
-            @foreach (var planta in listaPlanta)
-            {
-                <tr>
-                    <td width="10%"><img src="@planta.Imagen" style="width: 100%" /></td> <!--se usa <img/> en estas etiquetas html, no se para que estan los otros-->
-                    <td width="35%">@planta.Informacion.NombreCientifico</td>
-                    <td width="20%">@planta.Informacion.NombreVulgar</td>
+            <tr>
+                    <td width="10%">@planta.Imagen</td>
+                    <td width="35%">@planta.NombreCientifico</td>
+                    <td width="20%">@planta.NombreVulgar</td>
                     <td width="35%">
                         <button class="btn btn-primary" @onclick="() => EditarPlanta(planta)">
 
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" /></svg>
-                        
+
                         </button>
                         <button class="btn btn-danger" @onclick="() => BorrarPlanta(planta)">
-                            
+
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" /><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" /></svg>
 
                         </button>
                     </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3">No hay plantas disponibles.</td>
             </tr>
         }
-    </tbody>
-</table>
+    </table>
+}
+}
 
-
+@if (mensajeError != null)
+{
+    <p style="color:red">@mensajeError</p>
+}
 
 @code {
-    List<Planta> listaPlanta = new List<Planta>();
 
-    protected override async Task OnInitializedAsync()
+    private List<Plantas>? baseDePlantas;
+    private string? mensajeError;
+
+    private async Task CargarPlantas()
     {
-        listaPlanta = plantaService.GetPlanta();
+        try
+        {
+            mensajeError = null;
+            baseDePlantas = await ApiService.GetPlantas();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error: {ex.Message}";
+            Console.WriteLine(ex); // También lo ves en la consola
+        }
     }
 
     private void Volver()
@@ -69,24 +86,26 @@
         navigationManager.NavigateTo("/");
     }
 
-    private void EditarPlanta(Planta planta)
+    private void EditarPlanta(Plantas planta)
     {
-        navigationManager.NavigateTo($"/planta/{planta.Id}");
+        //ACA FALTA LA COMPROBACION DE USUARIO VALIDO
+        navigationManager.NavigateTo($"/planta/editar/{planta.Id}");
     }
 
-    private void BorrarPlanta(Planta planta)
+    private void BorrarPlanta(Plantas planta)
     {
-        @if (!sesionService.EstaAutenticado)
-        {
-            navigationManager.NavigateTo("/login");
-        }
-        plantaService.DeletePlanta(planta.Id); //Nota: no podes usar UsuarioService, tenes que usar el nombre que le diste arriba, en este caso, usuarioService, asumo que es porque UsuarioService es el nombre REAL del servicio y por buenas practicas eso no se hace.
-        //si se borran todos los usuarios, no se puede volver a agregar usuarios, resuelve eso
+        //ACA FALTA LA COMPROBACION DE USUARIO VALIDO
+        //ACA FALTA EL CODIGO PARA BORRAR UNA PLANTA
+        navigationManager.NavigateTo($"/planta/eliminar/{planta.Id}");
     }
 
     private void CrearPlanta()
     {
+        //ACA FALTA LA COMPROBACION DE USUARIO VALIDO
         // Navegar a la página de creación del producto
-        navigationManager.NavigateTo("/planta/0");
+        navigationManager.NavigateTo("/planta/crear");
     }
+
+    [Inject]
+    private PlantaService ApiService { get; set; } = default!;
 }

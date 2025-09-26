@@ -1,4 +1,13 @@
 ﻿using CosoParaProgramacion3Movil.Models;
+using System.Net.Http.Json;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+
 
 namespace CosoParaProgramacion3Movil.Services;
 
@@ -6,69 +15,41 @@ namespace CosoParaProgramacion3Movil.Services;
 
 public class PlantaService //Que es mejor? tener cajas negras con nombres muy distintos para diferenciarlos bien? o que sean genericos para que sean copiables y facilmente reusables?
 {
-    public readonly List<Planta> lista; //esto simula el _context de una coneccion a una base de datos
+    private readonly HttpClient _http;
 
-    #region Constructor
-    public PlantaService()
+    public PlantaService(HttpClient http)
     {
-        lista = new List<Planta>(); //no pongas "List<T>", pone solo el nombre de tu public readonly, de lo contrario te creara una nueva lista.
-
-        for (int i = 0; i < 10; i++)
-        {
-            var planta = PlantaFactory.CrearPlantaGenerica();
-            planta.Id = i + 1; // Puedes asignar un ID único
-            lista.Add(planta);
-        }
-
-        var planta1 = PlantaFactory.CrearPlantaConNombre("PlantaMuyBonita");
-        planta1.Id = lista.Max(p => p.Id) + 1;
-        planta1.Imagen = "img/plantaimages.jpg";    
-        lista.Add(planta1);
-    }
-    #endregion
-
-    #region Metodos
-    public List<Planta> GetPlanta()
-    {
-        return lista;
+        _http = http;
     }
 
-    public Planta GetPlanta(int id)
+    public async Task<List<Plantas>> GetPlantas()
     {
-        return lista.FirstOrDefault(p => p.Id == id);
+        var response = await _http.GetFromJsonAsync<List<Plantas>>("api/Plantas/listar");
+        return response ?? new List<Plantas>();
     }
 
-    public void AddPlanta(Planta planta)
+    public async Task<Plantas?> GetPlanta(int id)
     {
-        if (lista.Any())
-        {
-            planta.Id = lista.Max(p => p.Id) + 1;
-        }
-        else
-        {
-            planta.Id = 1;
-        } 
-        lista.Add(planta);
+        var response = await _http.GetFromJsonAsync<Plantas>($"api/Plantas/buscar/{id}");
+        return response;
     }
 
-    public void UpdatePlanta(Planta planta)
+    public async Task<bool> CreatePlanta(Plantas planta)
     {
-        var plantaExistente = lista.FirstOrDefault(u => u.Id == planta.Id);
-        if (plantaExistente != null)
-        {
-            plantaExistente.Informacion.NombreCientifico = planta.Informacion.NombreCientifico;
-            plantaExistente.Informacion.NombreVulgar = planta.Informacion.NombreVulgar;
-        }
+        var response = await _http.PostAsJsonAsync("api/Plantas/guardar", planta);
+        return response.IsSuccessStatusCode;
     }
 
-    public void DeletePlanta(int id)
+    public async Task<bool> UpdatePlanta(int id, Plantas planta)
     {
-        var planta = lista.FirstOrDefault(u => u.Id == id);
-        
-        if (planta != null)
-        {
-            lista.Remove(planta);
-        }
+        var response = await _http.PutAsJsonAsync($"api/Plantas/editar/{id}", planta);
+        return response.IsSuccessStatusCode;
     }
-    #endregion
+
+    public async Task<bool> DeletePlanta(int id)
+    {
+        var response = await _http.DeleteAsync($"api/Plantas/eliminar/{id}");
+        return response.IsSuccessStatusCode;
+    }
+
 }

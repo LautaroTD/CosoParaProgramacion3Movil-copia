@@ -1,0 +1,84 @@
+﻿@page "/planta/eliminar/{Id:int}"
+@inject PlantaService PlantaService
+@inject NavigationManager Navigation
+@using CosoParaProgramacion3Movil.Models
+@using CosoParaProgramacion3Movil.Services
+
+<h3>Eliminar Planta</h3>
+
+@if (cargando)
+{
+    <p>Cargando datos...</p>
+}
+else if (planta == null)
+{
+    <div class="alert alert-danger">No se encontró la planta.</div>
+    <button class="btn btn-secondary" @onclick="Volver">Volver</button>
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>¿Estás seguro que deseas eliminar la siguiente planta?</p>
+
+        <ul>
+            <li><strong>Nombre Científico:</strong> @planta.NombreCientifico</li>
+            <li><strong>Nombre Vulgar:</strong> @planta.NombreVulgar</li>
+            <li><strong>Autor:</strong> @planta.Autor</li>
+            <li><strong>Altura Máxima:</strong> @planta.AlturaMaxima cm</li>
+        </ul>
+
+        <button class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        <button class="btn btn-secondary" @onclick="Volver">Cancelar</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info mt-2">@mensaje</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Plantas? planta;
+    private bool cargando = true;
+    private string mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            planta = await PlantaService.GetPlanta(Id);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar la planta: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        var exito = await PlantaService.DeletePlanta(Id);
+
+        if (exito)
+        {
+            mensaje = "Planta eliminada correctamente.";
+            await Task.Delay(1500); // Espera breve antes de redirigir
+            Navigation.NavigateTo("/"); // Redirige a la página principal o lista
+        }
+        else
+        {
+            mensaje = "Error al eliminar la planta.";
+        }
+    }
+
+    private void Volver()
+    {
+        Navigation.NavigateTo("/planta");
+    }
+}

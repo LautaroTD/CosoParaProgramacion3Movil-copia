@@ -1,0 +1,106 @@
+﻿@page "/planta/editar/{Id:int}"
+@inject PlantaService PlantaService
+@inject NavigationManager navigationManager
+@using CosoParaProgramacion3Movil.Models
+@using CosoParaProgramacion3Movil.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Routing
+
+<h3>Editar Planta</h3>
+
+<button class="btn btn-primary" @onclick="Volver">Volver</button>
+
+@if (cargando)
+{
+    <p>Cargando datos...</p>
+}
+else if (planta == null)
+{
+    <div class="alert alert-danger">No se encontró la planta.</div>
+}
+else
+{
+    <EditForm Model="@planta" OnValidSubmit="GuardarCambios">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Nombre Científico:</label>
+            <InputText class="form-control" @bind-Value="planta.NombreCientifico" />
+        </div>
+
+        <div class="form-group">
+            <label>Nombre Vulgar:</label>
+            <InputText class="form-control" @bind-Value="planta.NombreVulgar" />
+        </div>
+
+        <div class="form-group">
+            <label>Autor:</label>
+            <InputText class="form-control" @bind-Value="planta.Autor" />
+        </div>
+
+        <div class="form-group">
+            <label>Época de Floración:</label>
+            <InputText class="form-control" @bind-Value="planta.EpocaFloracion" />
+        </div>
+
+        <div class="form-group">
+            <label>Altura Máxima (cm):</label>
+            <InputNumber class="form-control" @bind-Value="planta.AlturaMaxima" />
+        </div>
+
+        <div class="form-group">
+            <label>Descripción:</label>
+            <InputTextArea class="form-control" @bind-Value="planta.Descripcion" />
+        </div>
+
+        <div class="form-group">
+            <label>URL de Imagen:</label>
+            <InputText class="form-control" @bind-Value="planta.Imagen" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info mt-2">@mensaje</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Plantas? planta;
+    private string mensaje = string.Empty;
+    private bool cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        planta = await PlantaService.GetPlanta(Id);
+        cargando = false;
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/planta");
+    }
+
+    private async Task GuardarCambios()
+    {
+        if (planta == null)
+            return;
+
+        var exito = await PlantaService.UpdatePlanta(Id, planta);
+
+        if (exito)
+        {
+            mensaje = "Planta actualizada exitosamente.";
+        }
+        else
+        {
+            mensaje = "Error al actualizar la planta.";
+        }
+    }
+}

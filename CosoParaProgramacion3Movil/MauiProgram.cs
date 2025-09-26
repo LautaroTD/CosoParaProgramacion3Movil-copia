@@ -21,9 +21,14 @@ namespace CosoParaProgramacion3Movil
             builder.Services.AddSingleton<Services.PlantaService>(); //cchat gpt siempre se confunde y se olvida agregar el Services antes del servicio
             builder.Services.AddSingleton<Services.SesionService>();
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri("http://192.168.1.101:5005/") //192.168.1.100 (creo que cambia cada tanto) en casa. //10.13.238.218 con datos del celular
+    }); //ACORDATE DEL PREFIJO HTTP:// NO SEAS PELOTUDO //a veces cambia, el de tu casa cambia de ese a 192.168.1.101
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
