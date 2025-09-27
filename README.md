@@ -1,4 +1,5 @@
 # TrabajoPracticoN3Programacion3Movil
+Nota: no pude terminarlo, una de las versiones anteriores esta mejor que este. Puede cargar las plantas, pero todo lo que necesita autorizacion falla. Intente hacer la autorizacion a traves de api y me parece que eso me condeno.
 Enciclopedia de Plantas en una Aplicacion Movil.
 
 Contiene lo siguiente:
