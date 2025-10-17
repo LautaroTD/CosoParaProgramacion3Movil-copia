@@ -15,35 +15,35 @@ namespace CosoParaProgramacion3Movil.Services
         // GET: api/Usuarios/listar
         public async Task<List<Usuario>> GetUsuarios()
         {
-            var response = await _http.GetFromJsonAsync<List<Usuario>>("api/Usuarios/listar");
+            var response = await _http.GetFromJsonAsync<List<Usuario>>("api/Usuario/listar");
             return response ?? new List<Usuario>();
         }
 
         // GET: api/Usuarios/buscar/{id}
         public async Task<Usuario?> GetUsuario(int id)
         {
-            var response = await _http.GetFromJsonAsync<Usuario>($"api/Usuarios/buscar/{id}");
+            var response = await _http.GetFromJsonAsync<Usuario>($"api/Usuario/buscar/{id}");
             return response;
         }
 
         // POST: api/Usuarios/crear
         public async Task<bool> CrearUsuario(Usuario usuario)
         {
-            var response = await _http.PostAsJsonAsync("api/Usuarios/crear", usuario);
+            var response = await _http.PostAsJsonAsync("api/Usuario/guardar", usuario);
             return response.IsSuccessStatusCode;
         }
 
         // PUT: api/Usuarios/editar/{id}
         public async Task<bool> EditarUsuario(int id, Usuario usuario)
         {
-            var response = await _http.PutAsJsonAsync($"api/Usuarios/editar/{id}", usuario);
+            var response = await _http.PutAsJsonAsync($"api/Usuario/editar/{id}", usuario);
             return response.IsSuccessStatusCode;
         }
 
         // DELETE: api/Usuarios/eliminar/{id}
         public async Task<bool> EliminarUsuario(int id)
         {
-            var response = await _http.DeleteAsync($"api/Usuarios/eliminar/{id}");
+            var response = await _http.DeleteAsync($"api/Usuario/eliminar/{id}");
             return response.IsSuccessStatusCode;
         }
     }

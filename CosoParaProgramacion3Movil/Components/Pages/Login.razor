@@ -39,7 +39,22 @@
     {
         mensajeError = string.Empty;
 
-        var loginExitoso = await AuthService.LoginAsync(nombre, contrasena);
+        bool loginExitoso;
+
+        Console.WriteLine($"entro al metodo IniciarSesion()");
+
+        try
+        {
+            loginExitoso = await AuthService.LoginAsync(nombre, contrasena);
+        } 
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errox");
+            Console.WriteLine($"Errox: {ex.Message}");
+            return;
+        }
+
+        Console.WriteLine("paso la linea de LoginAsync en el metodo IniciarSesion");
 
         if (loginExitoso)
         {

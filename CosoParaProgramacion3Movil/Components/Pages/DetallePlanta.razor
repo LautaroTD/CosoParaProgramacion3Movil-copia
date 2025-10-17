@@ -53,6 +53,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+
         if (await sesionService.EstaAutenticadoAsync() == false)
         {
             navigationManager.NavigateTo("/login");

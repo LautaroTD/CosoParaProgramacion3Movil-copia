@@ -5,6 +5,7 @@
 @using System.Threading.Tasks;
 @using CosoParaProgramacion3Movil.Services;
 
+@inject PlantaService ApiService
 @inject NavigationManager navigationManager
 
 <!-- si esta pagina no carga, puede ser porque el url esta mal porque te olvidaste el prefijo PELOTUDO JJAJAJAJAAJAA QUE MOGOBLICO-->
@@ -73,10 +74,11 @@ else
         {
             mensajeError = null;
             baseDePlantas = await ApiService.GetPlantas();
+            Console.WriteLine($"todo deberia haber andado bien");
         }
         catch (Exception ex)
         {
-            mensajeError = $"Error: {ex.Message}";
+            mensajeError = $"Errol: {ex.Message}";
             Console.WriteLine(ex); // También lo ves en la consola
         }
     }
@@ -106,6 +108,4 @@ else
         navigationManager.NavigateTo("/planta/crear");
     }
 
-    [Inject]
-    private PlantaService ApiService { get; set; } = default!;
 }
