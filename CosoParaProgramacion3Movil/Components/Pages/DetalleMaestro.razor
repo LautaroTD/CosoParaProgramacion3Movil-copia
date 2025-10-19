@@ -1,0 +1,109 @@
+﻿@page "/maestro/{Id}"
+
+@using CosoParaProgramacion3Movil.Models
+@using CosoParaProgramacion3Movil.Services
+
+@inject UsuarioService usuarioService
+@inject NavigationManager navigationManager
+@inject AuthService sesionService
+
+<h3>
+    <span>Editar Usuario</span>
+</h3>
+
+<!--El problema estaba con el formulario de blazor-->
+@if (usuario == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="@formModel" OnValidSubmit="Grabar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Id</label>
+            <p>@usuario.Id</p>
+        </div>
+
+        <div class="mb-3">
+            <label>Nombre</label>
+            <p>@usuario.Name</p>
+        </div>
+
+        <div class="mb-3">
+            <label>Rol</label>
+            <InputText class="form-control" @bind-Value="formModel.Role" placeholder="Rol del usuario" />
+        </div>
+
+        <div class="mb-3">
+            <label>Imagen</label>
+            <InputText class="form-control" @bind-Value="formModel.Imagen" placeholder="URL de la imagen" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Volver">Volver</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public Usuario usuario;
+
+    string roleNuevo;
+    string imagenNuevo;
+
+
+    public UsuarioFormModel formModel = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("Llego a OnParametersSetAsync de DetalleMaestro. 6734");
+        if (await sesionService.EstaAutenticadoAsync() == false)
+        {
+            navigationManager.NavigateTo("/login");
+            return;
+        }
+        Console.WriteLine("Entrando a GetUsuario");
+
+        usuario = await usuarioService.GetUsuario(int.Parse(id));
+        
+        Console.WriteLine($"Llego la siguiente respuesta. 0000343: {usuario.Id}, {usuario.Name}, {usuario.Role}, {usuario.Imagen}");
+
+        Console.WriteLine("Paso el GetUsuario. XXX");
+
+        formModel.Role = usuario.Role;
+        formModel.Imagen = usuario.Imagen;
+    }
+
+    public void Volver()
+    {
+        // Navegar a la página de edición del producto
+        navigationManager.NavigateTo($"/maestro");
+    }
+
+    public async Task Grabar()
+    {
+        usuario.Role = string.IsNullOrWhiteSpace(formModel.Role) ? "basico" : formModel.Role;
+        usuario.Imagen = string.IsNullOrWhiteSpace(formModel.Imagen) ? "img/usericon.jpg" : formModel.Imagen;
+
+        Console.WriteLine($"a ver si cambio el fromModel. 929292X: {formModel.Role}, {formModel.Imagen}");
+
+        Console.WriteLine($"a ver si cambio el usuario. 929292: {usuario.Role}, {usuario.Imagen}");
+
+        await usuarioService.UpdateUsuario(int.Parse(id), usuario);
+
+        navigationManager.NavigateTo("/maestro");
+    }
+
+    public class UsuarioFormModel
+    {
+        public string Role { get; set; } = string.Empty;
+
+        public string Imagen { get; set; } = string.Empty;
+    }
+}
+

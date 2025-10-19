@@ -79,8 +79,9 @@
         if (await sesionService.EstaAutenticadoAsync() == true)
         {
             await sesionService.LogoutAsync();
-            navigationService.NavigateTo("/login");
-        } else
+            mensaje = "Sesion cerrada.";
+        } 
+        else
         {
             mensaje = "Usted no esta registrado, inicie sesion o registrese.";
         }

@@ -14,7 +14,6 @@ public class AuthService
 {
     private readonly HttpClient _http;
     private readonly CookieContainer _cookieContainer = new();
-
     public AuthService()
     {
         var handler = new HttpClientHandler
@@ -26,7 +25,7 @@ public class AuthService
 
         _http = new HttpClient(handler)
         {
-            BaseAddress = new Uri("http://10.173.107.218:5005/") // reemplazá por tu puerto real
+            BaseAddress = new Uri("http://192.168.1.100:5005/") 
         };
     }
 
@@ -37,15 +36,14 @@ public class AuthService
         login.Name = nombre;
         login.Password = contrasena;
 
-        Console.WriteLine($"Entro al metodo LoginAsync()");
-
         HttpContent content;
 
         try
         {
             var json = JsonSerializer.Serialize(login);
             content = new StringContent(json, Encoding.UTF8, "application/json");
-        } catch (Exception ex)
+        } 
+        catch (Exception ex)
         {
             Console.WriteLine($"Erroy:");
             Console.WriteLine($"Erroy: {ex.Message}");
@@ -54,9 +52,11 @@ public class AuthService
 
         HttpResponseMessage response;
 
+        Console.WriteLine("A punto de usar PostAsync");
+
         try
         {
-            response = await _http.PostAsync("http://10.0.2.2:5005/api/Usuario/login", content);
+            response = await _http.PostAsync("/api/Usuario/login", content);
         }
         catch (Exception ex)
         {
@@ -65,11 +65,36 @@ public class AuthService
             return false;
         }
 
+        if (response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            // Si querés obtener el token:
+            var result = JsonSerializer.Deserialize<LoginResponse>(responseBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            Console.WriteLine($"Token recibido: {result?.Token}");
+
+            return true;
+        }
+        else if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            Console.WriteLine("Credenciales inválidas.");
+            return false;
+        }
+        else
+        {
+            Console.WriteLine($"Error inesperado: {(int)response.StatusCode} - {response.ReasonPhrase}");
+            return false;
+        }
+
+        Console.WriteLine("Termino metodo LoginAsync");
+
         return true;
     }
 
     public async Task<bool> EstaAutenticadoAsync()
     {//si cambio este metodo y el metodo de la api, puedo tolerar roles
+        
         var response = await _http.GetAsync("api/Usuario/estado");
 
         if (response is null)
@@ -88,7 +113,6 @@ public class AuthService
             SecureStorage.Default.Remove("jwt_token");
         }
 
-        await Shell.Current.GoToAsync("//Home"); //esto puede estar mal
     }
 
 }

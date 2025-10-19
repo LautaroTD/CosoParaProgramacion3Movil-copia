@@ -1,0 +1,71 @@
+﻿@page "/maestro/crear"
+@inject UsuarioService usuarioService
+@inject NavigationManager navigationManager
+@using CosoParaProgramacion3Movil.Models
+@using System.ComponentModel.DataAnnotations
+@using CosoParaProgramacion3Movil.Services
+
+<h3>Crear Nuevo Usuario</h3>
+
+<button class="btn btn-primary" @onclick="Volver">Volver</button>
+
+<EditForm Model="@nuevoUsuario" OnValidSubmit="GuardarUsuario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Id:</label>
+        <InputNumber class="form-control" @bind-Value="nuevoUsuario.Id" />
+    </div>
+
+    <div class="form-group">
+        <label>Nombre:</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Name" />
+    </div>
+
+    <div class="form-group">
+        <label>Contraseña:</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Password" />
+    </div>
+
+    <div class="form-group">
+        <label>Rol:</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Role" />
+    </div>
+
+    <div class="form-group">
+        <label>Imagen:</label>
+        <InputText class="form-control" @bind-Value="nuevoUsuario.Imagen" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-2">@mensaje</div>
+}
+
+@code {
+    private Usuario nuevoUsuario = new Usuario();
+    private string mensaje = string.Empty;
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/maestro");
+    }
+
+    private async Task GuardarUsuario()
+    {
+        var resultado = await usuarioService.CreateUsuario(nuevoUsuario);
+        if (resultado)
+        {
+            mensaje = "Usuario creada exitosamente.";
+            nuevoUsuario = new Usuario(); // Limpiar el formulario
+        }
+        else
+        {
+            mensaje = "Error al crear la usuario.";
+        }
+    }
+}

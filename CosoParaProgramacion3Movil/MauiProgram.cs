@@ -30,7 +30,7 @@ namespace CosoParaProgramacion3Movil
                 AllowAutoRedirect = false
             })
             {  //192.168.1.100 (creo que cambia cada tanto) en casa. //10.13.238.218 con datos del celular
-                BaseAddress = new Uri("http://10.0.2.2:5005/"), // o la URL de tu API //ACORDATE DEL PREFIJO HTTP:// NO SEAS PELOTUDO //a veces cambia, el de tu casa cambia de ese a 192.168.1.101
+                BaseAddress = new Uri("http://192.168.1.100:5005/"), // o la URL de tu API //ACORDATE DEL PREFIJO HTTP:// NO SEAS PELOTUDO //a veces cambia, el de tu casa cambia de ese a 192.168.1.101
                 DefaultRequestHeaders = //NOTA CLAVE. USA http://10.0.2.2:5005/ CUANDO EJECUTES POR EMULADOR.
     {
         { "Accept", "application/json" }

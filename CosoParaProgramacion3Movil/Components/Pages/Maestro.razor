@@ -35,7 +35,7 @@
                     <td width="35%">@usuario.Name</td>
                     <td width="20%">@usuario.Role</td>
                     <td width="35%">
-                        <button class="btn btn-primary me-2" @onclick="() => EditarUsuario(usuario)">
+                        <button type="button" class="btn btn-primary me-2" @onclick="() => EditarUsuario(usuario)">
                             ✏️ Editar
                         </button>
                         <button class="btn btn-danger" @onclick="() => BorrarUsuario(usuario)">
@@ -81,11 +81,16 @@
     private void CrearUsuario()
     {
         // Ir a página de creación (id = 0 indica nuevo)
-        navigationManager.NavigateTo("/maestro/0");
+        navigationManager.NavigateTo("/maestro/crear");
     }
 
     private void EditarUsuario(Usuario usuario)
     {
+        //Nota: El try catch a veces puede interponerse y no mostrar escrituras de consola.
+        Console.WriteLine("entro a EditarUsuario");
+        
+        Console.WriteLine($"Se intenta editar el usuario {usuario.Id}/ ID {usuario.Id}");
+       
         navigationManager.NavigateTo($"/maestro/{usuario.Id}");
     }
 
@@ -102,10 +107,6 @@
         if (confirmado)
         {
             await CargarUsuarios(); // Refrescar la lista luego de eliminar
-        }
-        else
-        {
-            // Mostrar mensaje de error o alerta, si querés
         }
     }
 }
