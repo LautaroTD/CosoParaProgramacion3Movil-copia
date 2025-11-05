@@ -25,7 +25,7 @@ public class AuthService
 
         _http = new HttpClient(handler)
         {
-            BaseAddress = new Uri("http://192.168.1.100:5005/") 
+            BaseAddress = new Uri("http://programacion3movilcrudapi.tryasp.net/") 
         };
     }
 
@@ -74,6 +74,11 @@ public class AuthService
 
             Console.WriteLine($"Token recibido: {result?.Token}");
 
+            if (!string.IsNullOrWhiteSpace(result?.Token))
+            {
+                await SecureStorage.SetAsync("jwt_token", result.Token);
+            }
+
             return true;
         }
         else if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -87,17 +92,15 @@ public class AuthService
             return false;
         }
 
-        Console.WriteLine("Termino metodo LoginAsync");
-
-        return true;
     }
 
     public async Task<bool> EstaAutenticadoAsync()
     {//si cambio este metodo y el metodo de la api, puedo tolerar roles
-        
-        var response = await _http.GetAsync("api/Usuario/estado");
 
-        if (response is null)
+
+        var token = await SecureStorage.GetAsync("jwt_token");
+
+        if (token is null)
             return false;
 
         return true;

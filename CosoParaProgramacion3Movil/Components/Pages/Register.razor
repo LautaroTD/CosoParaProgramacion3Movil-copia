@@ -4,8 +4,8 @@
 
 @inject NavigationManager navigationManager
 @inject UsuarioService usuarioService
-@*
-@inject SesionService sesionService
+
+@inject AuthService sesionService
 
 <h3>
 
@@ -13,29 +13,24 @@
 
 </h3>
 
-<EditForm OnValidSubmit="@Grabar" Model="@usuario">
-    <div class="mt-3">
-        <label>Nombre</label>
-        <InputText @bind-Value="@nombreNuevo" placeholder="@usuario.Nombre" />
-    </div>
-    <div class="mt-3">
-        <label>Contraseña</label>
-        <InputText @bind-Value="@contrasenaNuevo" placeholder="@usuario.Contrasena" />
-    </div>
-    <div class="mt-3">
-        <label>Rol</label>
-        <InputText @bind-Value="@rolNuevo" placeholder="@usuario.Rol" />
-    </div>
-    <div class="mt-3">
-        <label>Imagen</label>
-        <InputText @bind-Value="@imagenNuevo" placeholder="@usuario.Imagen" />
-    </div>
-</EditForm>
+<div class="form-group">
+    <label>Nombre de usuario</label>
+    <input class="form-control" @bind="nombreNuevo" placeholder="Ingrese su nombre" />
+</div>
 
+<div class="form-group">
+    <label>Contraseña</label>
+    <input type="password" class="form-control" @bind="contrasenaNuevo" placeholder="Ingrese su contraseña" />
+</div>
+
+<div class="form-group">
+    <label>Imagen</label>
+    <input class="form-control" @bind="imagenNuevo" placeholder="Ingrese/La/Ruta/Para/Su/Imagen" />
+</div>
 
 <div class="text-center mt-3">
     <button class="btn btn-primary" @onclick="Volver">Cancelar</button>
-    <button class="btn btn-success" @onclick="Grabar">Crear</button>
+    <button class="btn btn-success" @onclick="Grabar">Registrarse</button>
 </div>
 
 
@@ -45,7 +40,7 @@
 
     string nombreNuevo;
     string contrasenaNuevo;
-    string rolNuevo;
+    string rolNuevo = "basico";
     string imagenNuevo;
 
     protected override void OnParametersSet()
@@ -68,17 +63,20 @@
 
     public async Task Grabar()
     {
-        if (nombreNuevo is not null) { usuario.Nombre = nombreNuevo; } else { usuario.Nombre = ""; }
-        if (contrasenaNuevo is not null) { usuario.Contrasena = contrasenaNuevo; } else { usuario.Contrasena = ""; }
-        if (rolNuevo is not null) { usuario.Rol = rolNuevo; } else { usuario.Rol = ""; }
-        if (imagenNuevo is not null) { usuario.Imagen = imagenNuevo; } else { usuario.Imagen = "img/generico.jpg"; }
+        if (nombreNuevo is null || contrasenaNuevo is null || imagenNuevo is null)
+        {
+            return;
+        }
 
-        usuarioService.AddUsuario(usuario);
+        usuario.Name = nombreNuevo;
+        usuario.Password = contrasenaNuevo;
+        usuario.Role = rolNuevo;
+        usuario.Imagen = imagenNuevo;
 
-        sesionService.Login(usuario.Nombre, usuario.Contrasena);
+        usuarioService.CreateUsuario(usuario);
+
+        sesionService.LoginAsync(usuario.Name, usuario.Password);
 
         navigationManager.NavigateTo("/");
     }
 }
-
-*@
